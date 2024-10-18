@@ -1,6 +1,7 @@
 # Compiled Object files
 *.o
 *.obj
+/venv
 
 # Compiled Dynamic libraries
 *.so
@@ -22,3 +23,29 @@ docs/
 
 # Code coverage
 *.lst
+
+# Django related
+*.log
+*.pot
+*.pyc
+__pycache__/
+local_settings.py
+
+# Media files
+media/
+
+# Static files
+staticfiles/
+static/
+
+# Django stuff:
+db.sqlite3
+db.sqlite3-journal
+
+# Environment Variables
+.env
+
+# Virtualenv
+venv/
+ENV/
+env/
