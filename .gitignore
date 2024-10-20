@@ -1,0 +1,47 @@
+# Python-related
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.so
+*.egg
+*.egg-info/
+.eggs/
+
+# Virtual environment
+venv/
+env/
+ENV/
+venv.bak/
+.vscode/
+.idea/
+.DS_Store
+
+# Django stuff:
+db.sqlite3
+/db.sqlite3-journal
+/staticfiles/
+/media/
+/local_settings.py
+
+# If you're using the Django migrations system:
+*/migrations/__pycache__/
+*/migrations/*.pyc
+*/migrations/*.pyo
+*/migrations/*.pyd
+
+# Logs
+*.log
+*.pot
+*.mo
+
+# OS generated files
+Thumbs.db
+Desktop.ini
+
+# Ignore the following if you're using Django's collectstatic feature
+/static/
+/staticfiles/
+
+# Ignore .env files with sensitive data
+.env
