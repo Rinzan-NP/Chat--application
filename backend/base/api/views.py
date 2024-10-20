@@ -9,16 +9,20 @@ from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from rest_framework import status
+
+from backend.base.models import ChatMessage
 from .serializer import (
     UserRegisterSerializer,
     UserDetailsUpdateSerializer,
     UserSerializer,
-    UpdateUserDetial
+    UpdateUserDetial,
+    MessageSerializer,
 )
-from rest_framework.permissions import IsAuthenticated,IsAdminUser
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .serializer import MyTokenObtainPairSerializer
 from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework.generics import UpdateAPIView
+from rest_framework.generics import UpdateAPIView, ListAPIView
+from django.db.models import Q, Subquery, OuterRef
 
 User = get_user_model()
 
@@ -148,46 +152,69 @@ class AdminLoginView(APIView):
 
         return Response(content, status=status.HTTP_200_OK)
 
+
 class UserListingView(APIView):
     permission_classes = [IsAdminUser]
 
     def get(self, request):
-        users = User.objects.filter(is_superuser = False)
-        serializer = UserDetailsUpdateSerializer(users, many=True)  # Use many=True for a queryset
-        serialized_data = serializer.data  
+        users = User.objects.filter(is_superuser=False)
+        serializer = UserDetailsUpdateSerializer(
+            users, many=True
+        )  # Use many=True for a queryset
+        serialized_data = serializer.data
         return Response(serialized_data)
 
+
 class UserDeleteView(APIView):
-    def delete(self,request, pk):
-        User.objects.get(id = pk).delete()
-        data = {
-            'id':pk,
-            'messsage': 'Deleted successfully '
-        }
+    def delete(self, request, pk):
+        User.objects.get(id=pk).delete()
+        data = {"id": pk, "messsage": "Deleted successfully "}
         return Response(data, status=status.HTTP_204_NO_CONTENT)
-    
+
+
 class UserDeatailView(APIView):
     permission_classes = [IsAdminUser]
 
     def get(self, request, pk):
         try:
-            user = User.objects.get(id = pk)
+            user = User.objects.get(id=pk)
         except User.DoesNotExist:
             message = "User not found"
             return Response({"detail": message}, status=status.HTTP_404_NOT_FOUND)
-                
+
         serializer = UserDetailsUpdateSerializer(user, many=False)
-        
+
         serialized_data = serializer.data
-        
+
         return Response(serialized_data, status=status.HTTP_200_OK)
-    
-    
+
+
 class UserUpdateView(UpdateAPIView):
     permission_classes = [IsAdminUser]
     queryset = User.objects.all()
     serializer_class = UpdateUserDetial
     lookup_field = "pk"
-    
 
 
+# message listing views
+class MessageList(ListAPIView):
+
+    serializer_class = MessageSerializer
+
+    def get_queryset(self):
+        user = self.kwargs["user_id"]
+
+        # Get the latest message for each conversation involving the user
+        last_messages = ChatMessage.objects.filter(
+            Q(sender=OuterRef("sender"), receiver=OuterRef("receiver"))
+            | Q(receiver=OuterRef("sender"), sender=OuterRef("receiver"))
+        ).order_by("-time")
+
+        # Annotate the filtered queryset with the last message for each conversation
+        messages = (
+            ChatMessage.objects.filter(Q(sender=user) | Q(receiver=user))
+            .distinct()
+            .annotate(last_message=Subquery(last_messages.values("id")[:1]))
+        )
+        
+        return messages
