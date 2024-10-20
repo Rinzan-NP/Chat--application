@@ -2,7 +2,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from base.models import Account
+from base.models import Account, ChatMessage
 
 User = get_user_model()
 
@@ -56,20 +56,37 @@ class UserDetailsUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "profile_pic", "first_name", "last_name", "email","phone_number"]
+        fields = [
+            "id",
+            "profile_pic",
+            "first_name",
+            "last_name",
+            "email",
+            "phone_number",
+        ]
 
 
 class UpdateUserDetial(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['first_name', 'last_name']
+        fields = ["first_name", "last_name"]
 
-    def update(self,instance, validated_data):
-        instance.first_name = validated_data.get('first_name', instance.first_name)
-        instance.last_name = validated_data.get('last_name', instance.last_name)
+    def update(self, instance, validated_data):
+        instance.first_name = validated_data.get("first_name", instance.first_name)
+        instance.last_name = validated_data.get("last_name", instance.last_name)
         instance.save()
         return instance
-    
 
 
-    
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Account
+        fields = ["email", "first_name", "last_name"]
+        
+
+class MessageSerializer(serializers.ModelSerializer):
+    reciever_profile = ProfileSerializer(read_only=True)
+    sender_profile = ProfileSerializer(read_only=True)
+    class Meta:
+        model = ChatMessage
+        fields = ["id","sender","sender_profile","reciever","reciever_profile","message","is_read","time"]
