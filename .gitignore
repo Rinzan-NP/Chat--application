@@ -45,3 +45,4 @@ Desktop.ini
 
 # Ignore .env files with sensitive data
 .env
+/venv/
