@@ -9,60 +9,68 @@ import isAuthUser from "../utils/isAuthUser";
 import { useDispatch, useSelector } from "react-redux";
 import { set_Authentication } from "../redux/Authentication/AuthenticationSlice";
 import PublicRoute from "../utils/PublicRoute";
+import Messages from "../pages/Messages";
 
 const UserWrapper = () => {
-  const dispatch = useDispatch();
+	const dispatch = useDispatch();
 
-  const authentication_user = useSelector((state) => state.authentication_user);
-  const checkAuth = async () => {
-    const isAuthenticated = await isAuthUser();
-    dispatch(
-      set_Authentication({
-        name: isAuthenticated.name,
-        isAuthenticated: isAuthenticated.isAuthenticated,
-        isAdmin: isAuthenticated.is_superuser,
-      })
-    );
-  };
+	const authentication_user = useSelector((state) => state.authentication_user);
+	const checkAuth = async () => {
+		const isAuthenticated = await isAuthUser();
+		dispatch(
+			set_Authentication({
+				name: isAuthenticated.name,
+				isAuthenticated: isAuthenticated.isAuthenticated,
+				isAdmin: isAuthenticated.is_superuser,
+			})
+		);
+	};
 
-  useEffect(() => {
-    if (!authentication_user.name) {
-      checkAuth();
-    }
-    
-    
-  }, [authentication_user]);
+	useEffect(() => {
+		if (!authentication_user.name) {
+			checkAuth();
+		}
+	}, [authentication_user]);
 
-  return (
-    <Routes>
-      <Route
-        exact
-        path="/profile"
-        element={
-          <PrivateRoute>
-            <Profile />
-          </PrivateRoute>
-        }
-      ></Route>
-      <Route exact path="/" element={<Home />}></Route>
-      <Route
-        path="/login"
-        element={
-          <PublicRoute>
-            <Login />
-          </PublicRoute>
-        }
-      />
-      <Route
-        path="/signup"
-        element={
-          <PublicRoute>
-            <SignUp />
-          </PublicRoute>
-        }
-      />
-    </Routes>
-  );
+	return (
+		<Routes>
+			<Route
+				exact
+				path="/profile"
+				element={
+					<PrivateRoute>
+						<Profile />
+					</PrivateRoute>
+				}
+			></Route>
+			<Route
+				exact
+				path="/message"
+				element={
+					<PrivateRoute>
+						<Messages />
+					</PrivateRoute>
+				}
+			></Route>
+			<Route exact path="/" element={<Home />}></Route>
+			<Route
+				path="/login"
+				element={
+					<PublicRoute>
+						<Login />
+					</PublicRoute>
+				}
+			/>
+			<Route
+				path="/signup"
+				element={
+					<PublicRoute>
+						<SignUp />
+					</PublicRoute>
+				}
+			/>
+		</Routes>
+	);
 };
 
 export default UserWrapper;

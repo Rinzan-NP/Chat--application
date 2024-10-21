@@ -36,7 +36,7 @@ const Homes = () => {
           </button>
         </div>
       ) : (
-        <h1>NO logined</h1>
+        <h1>Not logined</h1>
       )}
     </>
   );
