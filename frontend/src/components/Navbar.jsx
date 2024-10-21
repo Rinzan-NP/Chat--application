@@ -17,7 +17,7 @@ const Navbar = () => {
 							<Link to="/profile" className="text-white mr-4">
 								Profile
 							</Link>
-							<Link to="/message" className="text-white mr-4"></Link>
+							<Link to="/message" className="text-white mr-4">Message</Link>
 						</>
 					) : (
 						<>
