@@ -67,7 +67,7 @@ class Account(AbstractBaseUser):
         return f"{self.first_name} {self.last_name}"
 
     def has_perm(self, perm, obj=None):
-        return self.is_superadmin
+        return self.is_superuser
 
     def has_module_perms(self, add_label):
         return True

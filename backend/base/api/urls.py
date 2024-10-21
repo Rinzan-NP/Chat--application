@@ -9,7 +9,7 @@ from .views import (
     UserListingView,
     UserDeleteView,
     UserDeatailView,
-    UserUpdateView,
+    UserUpdateView,InboxView,GetMessagesView,SendMessageView
 )
 from rest_framework_simplejwt.views import TokenRefreshView
 
@@ -27,6 +27,10 @@ urlpatterns = [
     path("admin/users", UserListingView.as_view(), name="User_lisiting"),
     path("admin/user/delete/<pk>", UserDeleteView.as_view(), name="user_delete"),
     path("admin/user/detail/<pk>", UserDeatailView.as_view(), name="user_detail"),
-    path('admin/user/update/<pk>', UserUpdateView.as_view(), name='user_update')
-
+    path('admin/user/update/<pk>', UserUpdateView.as_view(), name='user_update'),
+    
+    #chat urls
+    path('inbox/<user>',InboxView.as_view(),name='inbox'), 
+    path('get-messages/<sender_id>/<receiver_id>',GetMessagesView.as_view(),name='get_messages'),
+    path('send-message/',SendMessageView.as_view(),name='send_message'),
 ]

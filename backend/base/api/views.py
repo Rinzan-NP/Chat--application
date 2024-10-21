@@ -1,7 +1,5 @@
-from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.views import APIView
 from rest_framework.exceptions import ParseError, AuthenticationFailed
@@ -10,18 +8,18 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from rest_framework import status
 
-from backend.base.models import ChatMessage
 from .serializer import (
     UserRegisterSerializer,
     UserDetailsUpdateSerializer,
     UserSerializer,
     UpdateUserDetial,
     MessageSerializer,
+    ChatMessage,
 )
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .serializer import MyTokenObtainPairSerializer
 from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework.generics import UpdateAPIView, ListAPIView
+from rest_framework.generics import UpdateAPIView, ListAPIView, CreateAPIView
 from django.db.models import Q, Subquery, OuterRef
 
 User = get_user_model()
@@ -197,7 +195,7 @@ class UserUpdateView(UpdateAPIView):
 
 
 # message listing views
-class MessageList(ListAPIView):
+class InboxView(ListAPIView):
 
     serializer_class = MessageSerializer
 
@@ -216,5 +214,21 @@ class MessageList(ListAPIView):
             .distinct()
             .annotate(last_message=Subquery(last_messages.values("id")[:1]))
         )
-        
+
         return messages
+
+
+class GetMessagesView(ListAPIView):
+
+    serializer_class = MessageSerializer
+
+    def get_queryset(self):
+        sender_id = self.kwargs["sender_id"]
+        reciever_id = self.kwargs["reciever_id"]
+        return ChatMessage.objects.filter(
+            sender__in=[sender_id, reciever_id], reciever__in=[reciever_id, sender_id]
+        )
+
+
+class SendMessageView(CreateAPIView):
+    serializer_class = MessageSerializer

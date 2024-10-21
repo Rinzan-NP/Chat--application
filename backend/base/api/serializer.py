@@ -82,11 +82,25 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
         fields = ["email", "first_name", "last_name"]
-        
+
 
 class MessageSerializer(serializers.ModelSerializer):
     reciever_profile = ProfileSerializer(read_only=True)
     sender_profile = ProfileSerializer(read_only=True)
+
     class Meta:
         model = ChatMessage
-        fields = ["id","sender","sender_profile","reciever","reciever_profile","message","is_read","time"]
+        fields = [
+            "id",
+            "user",
+            "sender",
+            "sender_profile",
+            "reciever",
+            "reciever_profile",
+            "message",
+            "is_read",
+            "time",
+        ]
+
+
+# class SearchUserView()
