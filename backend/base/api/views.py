@@ -9,6 +9,7 @@ from django.contrib.auth import authenticate
 from rest_framework import status
 
 from .serializer import (
+    ProfileSerializer,
     UserRegisterSerializer,
     UserDetailsUpdateSerializer,
     UserSerializer,
@@ -232,3 +233,25 @@ class GetMessagesView(ListAPIView):
 
 class SendMessageView(CreateAPIView):
     serializer_class = MessageSerializer
+
+
+class SearchUserView(ListAPIView):
+
+    serializer_class = UserDetailsUpdateSerializer
+    queryset = User.objects.all()
+    # permission_classes = [IsAuthenticated]
+
+    def list(self, request, *args, **kwargs):
+        username = self.kwargs["username"]
+        logged_in_user = self.request.user
+        # Get all users except the logged in user
+        users = User.objects.filter(
+            Q(email__icontains=username)
+            | Q(first_name__icontains=username)
+            | Q(last_name__icontains=username)
+        ).exclude(id=logged_in_user.id)
+        
+        serilizer = self.get_serializer(users, many=True)
+        return Response(serilizer.data,status=status.HTTP_200_OK)
+        
+        
